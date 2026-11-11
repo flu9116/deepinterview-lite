@@ -1,0 +1,48 @@
+{
+  "name": "deepinterview-lite-japanese-voice-spike",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "desktop/main.cjs",
+  "scripts": {
+    "desktop": "electron desktop/main.cjs",
+    "test:desktop": "node --test test/*.test.cjs",
+    "report:desktop": "node scripts/report-desktop.cjs",
+    "dev": "concurrently -k -n WEB,AGENT \"npm:dev:web\" \"npm:dev:agent\"",
+    "build:client": "esbuild src/client.ts --bundle --format=esm --platform=browser --outfile=public/client.js",
+    "dev:web": "npm run build:client && tsx watch src/server.ts",
+    "dev:agent": "tsx src/agent.ts dev",
+    "start:web": "tsx src/server.ts",
+    "start:agent": "tsx src/agent.ts start",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test test/**/*.test.ts",
+    "report": "tsx src/metrics/report.ts",
+    "kokoro:smoke": "tsx src/providers/kokoro-smoke.ts",
+    "kokoro:integration": "tsx scripts/test-kokoro-integration.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@livekit/agents": "1.9.5",
+    "@livekit/agents-plugin-deepgram": "1.9.5",
+    "@livekit/agents-plugin-livekit": "1.9.5",
+    "@livekit/agents-plugin-openai": "1.9.5",
+    "@livekit/agents-plugin-silero": "1.9.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "livekit-client": "2.22.3",
+    "livekit-server-sdk": "2.19.1",
+    "pdfjs-dist": "^6.4.299",
+    "tsx": "4.20.6",
+    "ws": "^8.22.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.7.0",
+    "concurrently": "^9.2.1",
+    "electron": "^44.9.0",
+    "esbuild": "^0.25.10",
+    "typescript": "^5.9.3"
+  }
+}

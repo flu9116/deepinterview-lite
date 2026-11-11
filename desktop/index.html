@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; media-src interview: blob:; connect-src 'self'; object-src 'none'; base-uri 'none'">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DeepInterview Lite</title><link rel="stylesheet" href="style.css"></head>
+<body><header><div><small>DeepInterview Lite · Windows</small><h1>面试助手</h1></div><nav><button id="interview-mode" class="selected">面试模式</button><button id="practice-mode">练习模式</button></nav></header>
+<aside id="service-notice" class="service-notice" hidden>
+  <div role="status" aria-live="polite" aria-atomic="true"><strong id="service-notice-title"></strong><div id="service-notice-message"></div></div>
+  <button type="button" id="close-service-notice" aria-label="关闭测试提示">×</button>
+</aside>
+<main><details id="service-settings" class="card"><summary>服务与模型设置（用户自备账号）</summary>
+<p class="note">软件不代充值。转写、LLM 和 LiveKit 按各服务商规则计费；本地录音与 PDF 管理无需 API Key。已配置的密钥不会回显，密码框留空表示保留，勾选清除才移除。首次保存会将当前环境配置写入 Windows 当前用户加密存储。</p>
+<p id="services-source" role="status">正在读取配置来源…</p>
+<fieldset><legend>语音识别 · Deepgram</legend>
+<label>API Key <input data-service="DEEPGRAM_API_KEY" type="password" autocomplete="new-password"></label><label><input type="checkbox" data-clear="DEEPGRAM_API_KEY"> 清除此 Key</label>
+<label>练习及面试默认模型 <select data-service="STT_PROFILE"><option value="nova-2-ja">Nova-2 日语</option><option value="nova-3-multi">Nova-3 多语</option></select></label>
+<button type="button" data-test-service="deepgram">测试已保存的 Deepgram 连接</button></fieldset>
+<fieldset><legend>文本 AI · OpenAI 兼容 Chat Completions</legend>
+<label>API 地址 <input data-service="LLM_BASE_URL" type="url" placeholder="https://api.openai.com/v1"></label>
+<label>模型名称 <input data-service="LLM_MODEL" type="text"></label>
+<label>API Key <input data-service="LLM_API_KEY" type="password" autocomplete="new-password"></label><label><input type="checkbox" data-clear="LLM_API_KEY"> 清除此 Key</label>
+<label>后台草稿 <select data-service="ASSIST_DRAFTS"><option value="true">开启（会额外调用 LLM）</option><option value="false">关闭（仅最终要点与必要语义判断）</option></select></label>
+<p class="note">自定义接口需要兼容流式输出、JSON 模式与当前请求参数；连接成功不代表全部功能兼容。更换域名必须更换或清除旧 Key。</p>
+<button type="button" data-test-service="llm">测试已保存的 LLM（会产生少量用量）</button></fieldset>
+<fieldset><legend>练习连接 · LiveKit（面试模式不需要）</legend>
+<label>项目 URL <input data-service="LIVEKIT_URL" type="url" placeholder="wss://your-project.livekit.cloud"></label>
+<label>API Key <input data-service="LIVEKIT_API_KEY" type="password" autocomplete="new-password"></label><label><input type="checkbox" data-clear="LIVEKIT_API_KEY"> 清除此 Key</label>
+<label>API Secret <input data-service="LIVEKIT_API_SECRET" type="password" autocomplete="new-password"></label><label><input type="checkbox" data-clear="LIVEKIT_API_SECRET"> 清除此 Secret</label>
+<label>练习判停 <select data-service="EOU_MODE"><option value="audio">云端音频判停（可能计费）</option><option value="semantic">本地语义模型（需要模型资源）</option><option value="vad">本地 VAD</option><option value="stt">STT 判停</option><option value="manual">手动回答完毕</option></select></label>
+<button type="button" data-test-service="livekit">测试已保存的 LiveKit 认证</button></fieldset>
+<fieldset><legend>练习朗读 · Kokoro</legend>
+<label>服务地址 <input data-service="KOKORO_URL" type="url"></label>
+<label>日语音色 <input data-service="KOKORO_VOICE" type="text" placeholder="jf_alpha"></label>
+<p class="note">默认本地运行，无按次 API 费用；需要用户安装模型与 Python 服务。此处不自动下载或启动。自建远程服务的资源费用由用户承担。</p>
+<button type="button" data-test-service="kokoro">检查已保存的 Kokoro 状态</button></fieldset>
+<div class="controls"><button id="save-services" type="button" class="primary">保存服务设置</button><button id="reload-services" type="button">重新读取</button><button id="clear-services" type="button">清除账号并恢复默认</button></div>
+<p id="services-result" role="status">请先保存，再测试。测试只发送固定短文本或连接请求，不发送个人 PDF 或录音；供应商可能计入用量。练习模式修改后需重启网页服务和 Agent。</p>
+</details><div id="interview-panel">
+<p class="intro">分别保存你的回答与电脑播放的提问，录音只保存在本机。</p>
+<section class="card"><div class="row"><h2>个人资料 PDF</h2><button id="import-pdf">导入 PDF</button></div>
+<p class="note">支持日文、中文文字型 PDF；勾选后用于回答辅助。可导出原 PDF；移除旧版会将助手副本放入回收站，不影响源文件。导入新版前可先移除旧版。扫描件暂不支持。</p><div id="profiles">尚未导入资料；仍可获得标注“資料不足”的回答结构。</div></section>
+<section class="card"><div class="row"><h2>双路音频</h2><span id="state" role="status">未开始</span></div>
+<div class="row"><label><input id="live-enabled" type="checkbox" checked> 实时转写与日语回答辅助</label><select id="stt-language" aria-label="转写语言"><option value="ja">日语优先 · Nova-2 ja</option><option value="multi">日中多语 · Nova-3 multi</option><option value="zh">中文 · Nova-2 zh</option></select></div>
+<p id="cloud-status" class="note">正在检查云端配置…</p>
+<label for="microphone">回答方 · 麦克风</label><div class="row"><select id="microphone"><option value="">系统默认麦克风</option></select><button id="refresh-devices">刷新设备</button></div>
+<div class="level"><span>回答方</span><meter id="candidate-level" min="0" max="1" value="0"></meter><span id="candidate-signal">未采集</span></div>
+<div class="level"><span>提问方</span><meter id="interviewer-level" min="0" max="1" value="0"></meter><span id="interviewer-signal">未采集</span></div>
+<p class="note">提问方来自 Windows 当前系统播放声音，可能包含通知或音乐。请戴耳机，并关闭无关声音。此版本不单独锁定 Teams 进程，不保存屏幕视频。</p>
+<div class="controls"><button id="start" class="primary">开始双路录音</button><button id="pause" disabled>暂停</button><button id="stop" disabled>结束并保存</button><strong id="timer">00:00</strong></div>
+<p id="message" role="status">开始后先说一句话，再播放一段声音，确认两路音量条分别变化。</p>
+<p id="destination" class="path"></p></section>
+<section class="card"><h2>实时转写</h2><p id="live-status" role="status">待开始</p><div class="transcript-columns"><div><h3>提问方 · 系统音频</h3><div id="interviewer-transcript" class="transcript"></div><p id="interviewer-interim" class="note"></p></div><div><h3>回答方 · 麦克风</h3><div id="candidate-transcript" class="transcript"></div><p id="candidate-interim" class="note"></p></div></div></section>
+<section class="card"><h2>日语回答要点</h2><label><input id="asking-mode" type="checkbox" disabled> 我方提问中（暂停回答辅助，录音与转写继续）</label><p id="asking-status" role="status">正常回答辅助</p><p id="shortcut-status" class="note">实时面试开始后可使用全局快捷键 Ctrl + Alt + Shift + Q 切换。</p><p class="note">先确认问题完整性，再在后台整理；续说会合并到未发布的问题中，只显示完整定稿。等待期间保留上一份回答，较长停顿仍可能被拆题。恢复辅助时等待下一道完整问题，不处理我方提问期间的积压内容。</p><p id="assist-status" class="note" role="status">等待提问；回答整理在后台进行。</p><div id="assistance"></div></section>
+<section class="card"><div class="row"><h2>本地录音与复盘</h2><button id="open-folder">打开保存文件夹</button></div><p class="note">两路独立音轨，分别回放。暂停区间不录入；暂停时间记在 session.json。转写与要点保存在同一会话文件夹。</p><div id="recordings">暂无录音</div></section>
+<section id="review-panel" class="card" hidden><div class="row"><h2>本场转写与简短复盘</h2><button id="generate-review">生成日语改进建议</button></div><pre id="review-advice"></pre><div id="review-content"></div></section>
+</div><section id="practice-panel" class="card" hidden><h2>练习模式</h2><p>在当前窗口进行日语语音练习。可填写岗位要求、选择个人 PDF，也可以直接开始基础练习。</p><button id="open-practice" class="primary">打开练习</button><p id="practice-status" role="status"></p></section>
+</main><script src="assist-display.js"></script><script src="renderer.js"></script></body></html>

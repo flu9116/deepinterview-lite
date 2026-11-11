@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DeepInterview Lite — Japanese Voice PoC</title>
+    <style>
+      body { font: 14px/1.45 system-ui, sans-serif; margin: 24px; max-width: 980px; color: #202124; }
+      button { margin: 0 8px 16px 0; padding: 8px 12px; }
+      section { border-top: 1px solid #ddd; padding: 12px 0; }
+      h2 { font-size: 14px; margin: 0 0 6px; }
+      pre { min-height: 32px; margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+      #interim { color: #666; }
+      .job-count-row { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; margin-top: 4px; }
+      #job-count { font-weight: 600; font-variant-numeric: tabular-nums; }
+      #job-limit { color: #9b310c; }
+      #job-count-rules { font-size: 13px; color: #526674; margin-top: 4px; }
+      #metrics, #log { max-height: 260px; overflow: auto; font-size: 12px; }
+    </style>
+  </head>
+  <body>
+    <h1>日语面试练习</h1>
+    <section>
+      <label for="practice-mode">练习模式</label>
+      <select id="practice-mode">
+        <option value="basic">基础练习</option><option value="advanced">进阶练习</option><option value="mock">拟真实战</option>
+      </select>
+      <p id="practice-mode-description"></p>
+      <fieldset id="basic-topics"><legend>常见题（取消勾选即可跳过）</legend></fieldset>
+    </section>
+    <section>
+      <h2>练习资料（可选）</h2>
+      <div id="job-panel" hidden>
+      <p><label for="job-requirements">目标公司／岗位要求</label></p>
+      <textarea id="job-requirements" rows="6" cols="65" maxlength="3000" autocomplete="off" aria-describedby="job-count job-count-rules" style="box-sizing: border-box; max-width: 100%;" placeholder="粘贴招聘 JD，可包含公司、岗位、主要职责和必备能力。"></textarea>
+      <div class="job-count-row"><output id="job-count" for="job-requirements" aria-live="off">已输入 0 / 3000 字符</output><span id="job-limit" role="status" hidden>已达上限，不能再输入。</span></div>
+      <p id="job-count-rules">中日英文字、数字、标点、空格和换行均计入；部分表情计 2 个或更多字符。提交时会去掉开头和结尾的空白。</p>
+      <p>进阶与实战必填。JD 会作为参考文本发送给所配置的 LLM；请勿粘贴机密信息。</p>
+      </div>
+      <p>与面试模式共用本地资料库；个人 PDF 可选。每次重新开始使用当前选择。</p>
+      <p>PDF 仅保存在本地；选中资料的文字节选会发送给 LLM 用于提问，最多 12000 字符，不是全文覆盖。支持文字型 PDF，最多选择 10 份。</p>
+      <input id="profile-file" type="file" accept="application/pdf,.pdf" />
+      <button id="profile-import">导入 PDF</button>
+      <button id="profile-refresh">刷新资料列表</button>
+      <p id="profile-status" role="status"></p>
+      <div id="profiles"></div>
+      <p>资料导出／移除请在桌面面试助手中操作，共用资料无需重复导入。</p>
+    </section>
+    <p>状态：<span id="status" role="status">待开始</span></p>
+    <p id="practice-notice" role="status"></p>
+    <p id="practice-timer" hidden></p>
+    <p><label><input type="checkbox" id="record-practice" checked> 保存本轮练习录音（桌面版，包含我的回答和 AI 朗读）</label></p>
+    <button id="connect">开始练习并开启麦克风</button>
+    <button id="commit" disabled>回答完毕</button>
+    <button id="replay-question" disabled>重播问题</button>
+    <button id="skip-question-audio" hidden>停止朗读</button>
+    <button id="pause" disabled>暂停</button>
+    <button id="stop" disabled>结束测试</button>
+    <button id="restart">重新开始</button>
+    <span id="replay-status" role="status"></span>
+    <p>回答完毕：提交当前回答。暂停：停止收音和 AI 播放，继续时保留对话（已中断的语音不重播）。结束测试：关闭麦克风并断开连接。重新开始：开启全新面试。</p>
+    <section><h2>AI 面试官</h2><pre id="response"></pre></section>
+    <section><h2>我的回答</h2><pre id="final"></pre><pre id="interim"></pre></section>
+    <section><h2>练习复盘</h2><p id="practice-save-status" role="status">关闭窗口前请点「结束测试」；转写和已开启的录音将保存到本机。</p>
+      <a id="practice-export" hidden>一键导出本轮录音与转写（ZIP）</a>
+      <button id="practice-save-retry" hidden>重试保存</button>
+      <details><summary>已保存的练习</summary><ul id="practice-archives"></ul></details>
+    </section>
+    <details><summary>连接和调试信息</summary><pre id="metrics"></pre><pre id="log"></pre></details>
+    <script type="module" src="/client.js"></script>
+  </body>
+</html>
+
