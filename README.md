@@ -12,6 +12,8 @@ DeepInterview Lite 是一款 Windows 桌面工具，用于双路录音、日语�
 
 ## 安装与使用
 
+- 第一次使用请从[新手入门](docs/新手入门.md)开始。也可以把[AI 安装与配置提示词](docs/AI安装与配置提示词.txt)复制给其他 AI，让它逐步指导。
+
 - [Windows 操作手册](docs/操作手册.md)涵盖首次安装、双路录音、练习、导出和常见故障。
 - [服务配置指南](docs/服务配置指南.md)说明如何填写自己的 API Key、测试连接和准备 Kokoro。
 - 安装包面向 Windows x64。当前 0.1.0 安装包处于验收阶段，请以 [GitHub Releases](https://github.com/flu9116/deepinterview-lite/releases) 列出的附件为准。源码 ZIP 需要按下面的步骤构建。
