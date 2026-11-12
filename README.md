@@ -17,6 +17,8 @@ DeepInterview Lite 是一款 Windows 桌面工具，用于双路录音、日语�
 - 安装包面向 Windows x64。当前 0.1.0 安装包处于验收阶段，请以 [GitHub Releases](https://github.com/flu9116/deepinterview-lite/releases) 列出的附件为准。源码 ZIP 需要按下面的步骤构建。
 - 软件计划免费提供。本地录音无需云账号。云服务用量由服务商按用户自己的账号计费，详见[费用和数据说明](docs/发布说明.md)。
 
+首次安装前，请按[下载校验与 Windows 提示](docs/操作手册.md#下载校验与-windows-提示)核对该版本的 SHA-256 和签名状态。可信签名可以显示经过验证的发布者，新版本仍可能触发 SmartScreen 的低信誉提示。
+
 ## 从源码运行
 
 在 Windows x64 上安装 Node.js 22 或更高版本，在项目目录打开 PowerShell：
